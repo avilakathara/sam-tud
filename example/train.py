@@ -4,14 +4,13 @@ import torch
 from model.wide_res_net import WideResNet
 from model.smooth_cross_entropy import smooth_crossentropy
 from data.cifar import Cifar
+from data.MNIST import MNIST
 from utility.log import Log
 from utility.initialize import initialize
 from utility.step_lr import StepLR
 from utility.bypass_bn import enable_running_stats, disable_running_stats
 
-import sys; sys.path.append("..")
-from sam import SAM
-
+import sam
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -32,12 +31,12 @@ if __name__ == "__main__":
     initialize(args, seed=42)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    dataset = Cifar(args.batch_size, args.threads)
+    dataset = MNIST(args.batch_size, args.threads)
     log = Log(log_each=10)
-    model = WideResNet(args.depth, args.width_factor, args.dropout, in_channels=3, labels=10).to(device)
+    model = WideResNet(args.depth, args.width_factor, args.dropout, in_channels=1, labels=10).to(device)
 
     base_optimizer = torch.optim.SGD
-    optimizer = SAM(model.parameters(), base_optimizer, rho=args.rho, adaptive=args.adaptive, lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
+    optimizer = sam.SAM(model.parameters(), base_optimizer, rho=args.rho, adaptive=args.adaptive, lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
     scheduler = StepLR(optimizer, args.learning_rate, args.epochs)
 
     for epoch in range(args.epochs):

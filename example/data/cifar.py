@@ -23,8 +23,8 @@ class Cifar:
             transforms.Normalize(mean, std)
         ])
 
-        train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=train_transform)
-        test_set = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=test_transform)
+        train_set = torchvision.datasets.CIFAR10(root='./data/cifar', train=True, download=True, transform=train_transform)
+        test_set = torchvision.datasets.CIFAR10(root='./data/cifar', train=False, download=True, transform=test_transform)
 
         self.train = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=threads)
         self.test = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=threads)
