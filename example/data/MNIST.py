@@ -11,8 +11,6 @@ class MNIST:
         mean, std = self._get_statistics()
 
         train_transform = transforms.Compose([
-            torchvision.transforms.RandomCrop(size=(32, 32), padding=4),
-            torchvision.transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean, std),
             Cutout()
@@ -23,8 +21,8 @@ class MNIST:
             transforms.Normalize(mean, std)
         ])
 
-        train_set = torchvision.datasets.FashionMNIST(root='./data/MNIST', train=True, download=True, transform=train_transform)
-        test_set = torchvision.datasets.FashionMNIST(root='./data/MNIST', train=False, download=True, transform=test_transform)
+        train_set = torchvision.datasets.MNIST(root='./data/MNIST', train=True, download=True, transform=train_transform)
+        test_set = torchvision.datasets.MNIST(root='./data/MNIST', train=False, download=True, transform=test_transform)
 
         self.train = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=threads)
         self.test = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=threads)
@@ -32,7 +30,7 @@ class MNIST:
         self.classes = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
 
     def _get_statistics(self):
-        train_set = torchvision.datasets.FashionMNIST(root='./MNIST', train=True, download=True, transform=transforms.ToTensor())
+        train_set = torchvision.datasets.MNIST(root='./MNIST', train=True, download=True, transform=transforms.ToTensor())
 
         data = torch.cat([d[0] for d in DataLoader(train_set)])
         return data.mean(dim=[0, 2, 3]), data.std(dim=[0, 2, 3])
