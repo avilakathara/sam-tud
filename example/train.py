@@ -85,8 +85,8 @@ if __name__ == "__main__":
                 best_accuracies.append(log.epoch_state["accuracy"] / 100.0)
             accuracies[(lr, rho)] = max(best_accuracies) / 100.0
             log.flush()
-        print(accuracies)
-        
+    print(accuracies)
+
 # Remove SAM import and SAM-specific arguments from argparse
 
 # import argparse
