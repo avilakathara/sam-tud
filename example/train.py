@@ -112,18 +112,16 @@ from utility.step_lr import StepLR
 from model.neural_net import SimpleNN
 from utility.bypass_bn import enable_running_stats, disable_running_stats
 
-learning_rates = [0.01, 0.05, 0.1, 0.2, 0.3]
-accuracies = {}  # Dictionary to hold accuracy for each learning rate
-
+max_accuracies = []
 if __name__ == "__main__":
-    for lr in learning_rates:
+    for i in range(5):
         parser = argparse.ArgumentParser()
         parser.add_argument("--batch_size", default=128, type=int)
         parser.add_argument("--depth", default=16, type=int)
         parser.add_argument("--dropout", default=0.0, type=float)
         parser.add_argument("--epochs", default=100, type=int)
         parser.add_argument("--label_smoothing", default=0.1, type=float)
-        parser.add_argument("--learning_rate", default=lr, type=float)  # Use current lr from the loop
+        parser.add_argument("--learning_rate", default=0.05, type=float)  # Use current lr from the loop
         parser.add_argument("--momentum", default=0.9, type=float)
         parser.add_argument("--threads", default=2, type=int)
         parser.add_argument("--weight_decay", default=0.0005, type=float)
@@ -136,10 +134,11 @@ if __name__ == "__main__":
         dataset = MNIST(args.batch_size, args.threads)
         log = Log(log_each=10)
         model = SimpleNN().to(device)
-        optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
+        optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum,
+                                    weight_decay=args.weight_decay)
         scheduler = StepLR(optimizer, args.learning_rate, args.epochs)
 
-        best_accuracies = []
+        accuracies = []
 
         for epoch in range(args.epochs):
             model.train()
@@ -170,7 +169,8 @@ if __name__ == "__main__":
                     log(model, loss.cpu(), correct.cpu())
 
             # Record the final accuracy for the current learning rate
-            best_accuracies.append(log.epoch_state["accuracy"] / 100.0)
-        accuracies[args.learning_rate] = max(best_accuracies)
+            accuracies.append(log.epoch_state["accuracy"])
+        max_accuracies.append(max(accuracies)/100.0)
         log.flush()
-    print(accuracies)
+
+    print(max_accuracies)
