@@ -153,3 +153,10 @@ In conclusion, SAM is an interesting variant of optimizers that minimizes the sh
 \- Over the years some variants of SAM have been researched. The experiments can be repeated using those.
 
 \- Sam can be compared against more modern optimizers, like Adam for instance.
+
+# Contributors
+
+**Viraj Biharie**, **Thomas Kuiper**, **Justin Luu**, **Arjun Vilakathara**
+
+All contributors have worked on the following criteria: Reproduction: Reproduced the experiment for SAM vs. SGD, new code variant: adjusted the code so it works with new datasets and we evaluated different datasets to obtain similar results.
+
