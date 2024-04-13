@@ -4,7 +4,7 @@ The paper "Sharpness-Aware Minimization for Efficiently Improving Generalization
 
 # Scope of Evaluation
 
-Our evaluation aims to replicate the findings of the original paper using the MNIST fashion dataset and CIFAR-10 dataset. The evaluation is based on the following criteria:  model accuracy, generalization to test datasets, and comparison between SAM and SGD across different epoch settings. Our replication seeks to confirm the findings of the original paper that shows SAM’s robustness over SGD.
+Our evaluation aims to replicate the findings of the original paper using the MNIST fashion dataset and CIFAR-10 dataset. The evaluation is based on the following criteria:  model accuracy, generalization to test datasets, and comparison between SAM and Stochastic Gradient Descent (SGD) across different epoch settings. Our replication seeks to confirm the findings of the original paper that shows SAM’s robustness over SGD.
 
 # Dataset
 <table>
@@ -32,7 +32,7 @@ To ensure that training was effective, the following series of pre-processing st
 
 # SAM vs. SGD: A Comparative Analysis
 
-When optimizing the training of a neural network, we consider the following two methods: Stochastic Gradient Descent (SGD) and Sharpness-Aware Minimization (SAM). Each method offers distinct approaches to parameter optimization, influencing training efficiency and generalization performance.
+When optimizing the training of a neural network, we consider the following two methods: SGD and SAM. Each method offers distinct approaches to parameter optimization, influencing training efficiency and generalization performance.
 
 SGD operates by iteratively adjusting model parameters in the direction of the steepest descent of the loss function. Given a training dataset `S` drawn i.i.d. from distribution `D`, SGD aims to minimize the empirical training set loss:
 
@@ -75,7 +75,7 @@ After setting the base project up in kaggle, we ran the code using SAM and SGD o
 In terms of hyperparameter tuning, we left most of the parameters at their default values to compare our results as closely to the paper as possible. However, to properly compare Sam and SGD we tested both methods on a varying number of Epochs, similar to how the results are shown in the paper for different numbers of Epochs. Finally, for the simpler neural network model, we tested the performance of SAM and SGD on different values for the learning rate and ρ-value
 
 # Experiment SAM vs. SGD
-The experiment was designed to compare the performance of the optimization algorithms Sharpness-Aware Minimization (SAM) and Stochastic Gradient Descent (SGD) on training a wide residual network (Wide-res-net). The model was trained on two datasets: CIFAR-10 and MNIST Fashion. The training was carried out over two different lengths: 100 epochs and 200 epochs. Each configuration was run three times to ensure the reliability of the results.
+The experiment was designed to compare the performance of the optimization algorithms SAM and SGD on training a wide residual network (Wide-res-net). The model was trained on two datasets: CIFAR-10 and MNIST Fashion. The training was carried out over two different lengths: 100 epochs and 200 epochs. Each configuration was run three times to ensure the reliability of the results.
 
 The hypothesis is that SAM will perform better than SGD because it is better at generalizing.
 
@@ -102,7 +102,7 @@ The results indicate that the performance of SAM and SGD is roughly equivalent, 
 Experiment SimpleNN model SGD vs SAM\
 The first experiment did not give the results we expected, so we decided to do a simpler experiment with a smaller dataset and model. A smaller experiment is easier to understand and conduct so this seemed like a good option. Instead of the big wideResNet model, we used a simple 3-layer fully connected model to learn to classify the classic MNIST digits dataset.
 
-This experiment evaluates the performance of Stochastic Gradient Descent (SGD) and Sharpness-Aware Minimization (SAM) on a simple neural network model—a fully connected, 3-layer neural network—using the MNIST digits dataset.
+This experiment evaluates the performance of SGD and SAM on a simple neural network model—a fully connected, 3-layer neural network—using the MNIST digits dataset.
 
 # Methodology
 
