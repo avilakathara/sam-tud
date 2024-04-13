@@ -7,7 +7,22 @@ The paper "Sharpness-Aware Minimization for Efficiently Improving Generalization
 Our evaluation aims to replicate the findings of the original paper using the MNIST fashion dataset and CIFAR-10 dataset. The evaluation is based on the following criteria:  model accuracy, generalization to test datasets, and comparison between SAM and SGD across different epoch settings. Our replication seeks to confirm the findings of the original paper that shows SAM’s robustness over SGD.
 
 # Dataset
-![CIFAR-10 Dataset Sample]()
+<table>
+  <tr>
+    <td>
+      <img src="img/fashion_mnist-3.0.1.png" alt="Fashion MNIST"/>
+      <br>
+      <figcaption><center>Fashion MNIST Dataset</center></figcaption>
+    </td>
+    <td>
+      <img src="img/cifar10-3.0.2.png" alt="Cifar-10"/>
+      <br>
+      <figcaption><center>CIFAR-10 Dataset</center></figcaption>
+    </td>
+  </tr>
+</table>
+
+
 
 For our replication study, we chose the CIFAR-10 and MNIST fashion datasets, both widely recognized benchmarks in the machine learning field. CIFAR-10 is known for its complexity and diversity in image classification tasks, and the MNIST fashion dataset provides a set of grayscale images of apparel that provide their own challenges. The choice of these datasets is relevant as they are standard for evaluating the generalization improvements claimed by SAM and are different enough from each other to provide a more thorough review.
 
@@ -64,6 +79,11 @@ The experiment was designed to compare the performance of the optimization algor
 
 The hypothesis is that SAM will perform better than SGD because it is better at generalizing.
 
+The results of this experiment are displayed in Table 1.
+
+<div align="center">
+<h4 style="bold">Table 1: SAM vs. SGD Comparison</h4>
+
 |              |        |       |       |         |         |
 | ------------ | -----: | ----- | ----- | ------- | ------- |
 |              | Epochs | Sam   | SGD   | Sam     | SGD     |
@@ -74,7 +94,8 @@ The hypothesis is that SAM will perform better than SGD because it is better at 
 |              |    200 | 96.69 % | 96.86 % | 95.77 % | 95.90 % |
 |              |    200 | 96.96 % | 96.83 % | 96.04 % | 95.94 % |
 |              |    200 | 96.98 % | 96.87 % | 95.77 % | 95.92 % |
-| Average:     |        | 96.88 % | 96.85 % | 95.86 % | 95.92 % |
+| Average:     |        | 96.88 % | 96.85 % | 95.86 % | 95.92 % |
+</div>
 
 The results indicate that the performance of SAM and SGD is roughly equivalent, which is unexpected given the findings from the original research paper, where SAM was reported to outperform SGD. This discrepancy could be attributed to several factors: The architecture of the Wide-res-net used in our experiments, although intended to mimic that of the research paper, might have differences in layer configurations, activation functions, or other architectural details that affect the performance of the optimizers.
 
@@ -93,21 +114,26 @@ SGD: Optimization focused solely on the learning rate, testing the same range of
 
 Experimental Setup
 
-Upon establishing the optimal hyperparameters (learning rate=0.05), the simple neural network model was trained using each optimizer configuration five times, with each run lasting 100 epochs. This extensive testing ensures the reliability of our findings.
+Upon establishing the optimal hyperparameters for SGD (learning rate=0.05) and for SAM (learning rate=0.05, rho=0.05), the simple neural network model was trained using each optimizer configuration five times, with each run lasting 100 epochs. This extensive testing ensures the reliability of our findings.
 
-The results are:
+The results of this experiment are displayed in Table 2.
+
+<div align="center">
+  
+<h4 style="bold">Table 2: Performance Comparison of SAM and SGD on the SimpleNN Model Using MNIST</h4>
 
 |          |        |        |                 |
 | -------- | -----: | ------ | --------------- |
 |          |        | MNIST  |                 |
 |          | Epochs | SAM    | SGD             |
 | SimpleNN |    100 | 5 runs | 5 runs          |
-|          |        | 98.79  | 98.73           |
-|          |        | 98.79  | 98.73           |
-|          |        | 98.79  | 98.73           |
-|          |        | 98.79  | 98.73           |
-|          |        | 98.79  | 98.73           |
+|          |        | 98.79% | 98.73%          |
+|          |        | 98.79% | 98.73%          |
+|          |        | 98.79% | 98.73%          |
+|          |        | 98.79% | 98.73%          |
+|          |        | 98.79% | 98.73%          |
 
+</div>
  
 
 The results show that SAM performs better than SGD, but only slightly.
