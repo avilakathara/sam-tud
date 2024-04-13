@@ -28,7 +28,7 @@ For our replication study, we chose the CIFAR-10 and MNIST fashion datasets, bot
 
 # Data Pre-processing
 
-To ensure that training was effective, we implemented a series of pre-processing steps. For both datasets, we normalized the images to have a consistent mean and standard deviation, aiding in model convergence and performance. We applied random crops and horizontal flips to introduce variability, in order to simulate data augmentation techniques that improve model robustness. Additionally, we utilized a technique known as Cutout as a form of regularization, randomly masking out sections of input images during training to further push the model towards better generalization.
+To ensure that training was effective, the following series of pre-processing steps were used. For both datasets, the images were normalized to have a consistent mean and standard deviation, aiding in model convergence and performance. Random crops and horizontal flips were applied to introduce variability, in order to simulate data augmentation techniques that improve model robustness. Additionally, a technique known as Cutout was utilized as a form of regularization, randomly masking out sections of input images during training to further push the model towards better generalization.
 
 # SAM vs. SGD: A Comparative Analysis
 
