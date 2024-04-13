@@ -102,7 +102,7 @@ The results indicate that the performance of SAM and SGD is roughly equivalent, 
 Experiment SimpleNN model SGD vs SAM\
 The first experiment did not give the results we expected, so we decided to do a simpler experiment with a smaller dataset and model. A smaller experiment is easier to understand and conduct so this seemed like a good option. Instead of the big wideResNet model, we used a simple 3-layer fully connected model to learn to classify the classic MNIST digits dataset.
 
-This experiment evaluates the performance of Stochastic Gradient Descent (SGD) and Sharpness-Aware Minimization (SAM) on a simple neural network model—a fully connected, two-layer neural network—using the MNIST digits dataset.
+This experiment evaluates the performance of Stochastic Gradient Descent (SGD) and Sharpness-Aware Minimization (SAM) on a simple neural network model—a fully connected, 3-layer neural network—using the MNIST digits dataset.
 
 # Methodology
 
