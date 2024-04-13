@@ -7,6 +7,7 @@ The paper "Sharpness-Aware Minimization for Efficiently Improving Generalization
 Our evaluation aims to replicate the findings of the original paper using the MNIST fashion dataset and CIFAR-10 dataset. The evaluation is based on the following criteria:  model accuracy, generalization to test datasets, and comparison between SAM and SGD across different epoch settings. Our replication seeks to confirm the findings of the original paper that shows SAM’s robustness over SGD.
 
 # Dataset
+![CIFAR-10 Dataset Sample]()
 
 For our replication study, we chose the CIFAR-10 and MNIST fashion datasets, both widely recognized benchmarks in the machine learning field. CIFAR-10 is known for its complexity and diversity in image classification tasks, and the MNIST fashion dataset provides a set of grayscale images of apparel that provide their own challenges. The choice of these datasets is relevant as they are standard for evaluating the generalization improvements claimed by SAM and are different enough from each other to provide a more thorough review.
 
@@ -14,13 +15,51 @@ For our replication study, we chose the CIFAR-10 and MNIST fashion datasets, bot
 
 To ensure that training was effective, we implemented a series of pre-processing steps. For both datasets, we normalized the images to have a consistent mean and standard deviation, aiding in model convergence and performance. We applied random crops and horizontal flips to introduce variability, in order to simulate data augmentation techniques that improve model robustness. Additionally, we utilized a technique known as Cutout as a form of regularization, randomly masking out sections of input images during training to further push the model towards better generalization.
 
-—--------------------------
+# SAM vs. SGD: A Comparative Analysis
 
-VIRAJ
+When optimizing the training of a neural network, we consider the following two methods: Stochastic Gradient Descent (SGD) and Sharpness-Aware Minimization (SAM). Each method offers distinct approaches to parameter optimization, influencing training efficiency and generalization performance.
 
-—--------------------------
+SGD operates by iteratively adjusting model parameters in the direction of the steepest descent of the loss function. Given a training dataset `S` drawn i.i.d. from distribution `D`, SGD aims to minimize the empirical training set loss:
 
-# Experiment SAM vs. SGD\
+````math
+L_S(w) = \frac{1}{n} \sum_{i=1}^{n} l(w, x_i, y_i)
+````
+
+where `l` denotes the per-data-point loss function.
+
+While SGD's simplicity and wide applicability have made it a popular choice, its susceptibility to suboptimal convergence in the presence of non-convex loss landscapes poses challenges, particularly for modern overparameterized models like deep neural networks.
+
+In contrast, SAM introduces a novel perspective on optimization by considering the sharpness of the loss landscape. Rather than solely minimizing the empirical training loss, SAM seeks parameter values that yield uniformly low training loss across neighborhoods of the parameter space. The motivation behind SAM stems from bounding generalization ability in terms of neighborhood-wise training loss, emphasizing the importance of exploring regions with low loss and low curvature.
+
+The SAM algorithm formulates the optimization problem as:
+
+````math
+\min_w L_{S}^{SAM}(w) + \lambda \|w\|_2^2
+````
+
+where
+
+````math
+L_{S}^{SAM}(w) = \max_{\|\epsilon\|_p \leq \rho} L_S(w + \epsilon)
+````
+
+Here ρ ≥ 0 is a hyperparameter and p ∈ [1, ∞].
+
+In terms of performance, SGD, being a classic optimization algorithm, often struggles with navigating complex, non-convex loss landscapes. Its reliance on the gradient direction alone can lead to erratic updates, causing convergence issues and suboptimal solutions, especially with overparameterized models like deep neural networks. Conversely, SAM takes a more nuanced approach by considering the sharpness of the loss landscape. By seeking parameter values that result in uniformly low training loss across local neighborhoods, SAM aims to provide smoother convergence paths, potentially leading to better optimization performance, especially in scenarios with complex loss surfaces.
+
+In terms of computational efficiency, SGD holds the advantage. Its straightforward update rule and minimal computational overhead make it highly efficient, particularly for large-scale datasets and models. On the other hand, SAM introduces additional computations due to its regularization term, which imposes a computational burden that requires an additional backpropagation step. Thus, while SGD excels in efficiency, SAM sacrifices computational speed for potentially improved convergence stability and generalization performance.
+
+Based on the paper, we believe that the choice between SAM and SGD  depends on the desired outcomes and priorities of the task at hand. SGD remains a solid choice for scenarios where computational efficiency is limited and where the primary focus lies on training speed. Its simplicity and wide applicability make it suitable for various applications. However, if the goal is to enhance generalization performance, mitigate overfitting, or improve model robustness, SAM can be a better alternative. By considering the local sharpness of the loss landscape, SAM aims to produce models with better generalization capabilities, potentially leading to improved performance on unseen data. Thus, while SGD offers simplicity and efficiency, SAM offers the potential for better generalization and robustness, albeit with increased computational overhead.
+
+## Training Procedure
+
+We started with cloning the provided code from github and importing it to kaggle. On kaggle we had to switch the "internet" to on for it to actually run, and we ran it on the "GPU T4 x2" accelerator. We also had to specify the specific "sys.path.append" file path on kaggle for it to run properly.
+
+After setting the base project up in kaggle, we ran the code using SAM and SGD on both the MNIST and Cifar-10 datasets. The model that we used for these 2 datasets was a Wide Residual Network (Wide-ResNet), similar to the paper. We later also ran a simpler neural network model that consisted of only 3 layers on the MNIST-digits dataset.
+
+In terms of hyperparameter tuning, we left most of the parameters at their default values to compare our results as closely to the paper as possible. However, to properly compare Sam and SGD we tested both methods on a varying number of Epochs, similar to how the results are shown in the paper for different numbers of Epochs. Finally, for the simpler neural network model, we tested the performance of SAM and SGD on different values for the learning rate and ρ-value
+
+# Experiment SAM vs. SGD
 The experiment was designed to compare the performance of the optimization algorithms Sharpness-Aware Minimization (SAM) and Stochastic Gradient Descent (SGD) on training a wide residual network (Wide-res-net). The model was trained on two datasets: CIFAR-10 and MNIST Fashion. The training was carried out over two different lengths: 100 epochs and 200 epochs. Each configuration was run three times to ensure the reliability of the results.
 
 The hypothesis is that SAM will perform better than SGD because it is better at generalizing.
