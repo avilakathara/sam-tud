@@ -4,7 +4,7 @@ The paper "Sharpness-Aware Minimization for Efficiently Improving Generalization
 
 # Scope of Evaluation
 
-Our evaluation aims to replicate the findings of the original paper using the MNIST fashion dataset and CIFAR-10 dataset. The evaluation is based on the following criteria:  model accuracy, generalization to test datasets, and comparison between SAM and Stochastic Gradient Descent (SGD) across different epoch settings. Our replication seeks to confirm the findings of the original paper that shows SAM’s robustness over SGD.
+Our evaluation aims to replicate the findings of the original paper using the MNIST fashion dataset and CIFAR-10 dataset. The evaluation is based on the following criteria: model accuracy, generalization to test datasets, and comparison between SAM and Stochastic Gradient Descent (SGD) across different epoch settings. Our replication seeks to confirm the findings of the original paper that shows SAM’s robustness over SGD.
 
 # Dataset
 <table>
@@ -64,7 +64,7 @@ In terms of performance, SGD, being a classic optimization algorithm, often stru
 
 In terms of computational efficiency, SGD holds the advantage. Its straightforward update rule and minimal computational overhead make it highly efficient, particularly for large-scale datasets and models. On the other hand, SAM introduces additional computations due to its regularization term, which imposes a computational burden that requires an additional backpropagation step. Thus, while SGD excels in efficiency, SAM sacrifices computational speed for potentially improved convergence stability and generalization performance.
 
-Based on the paper, we believe that the choice between SAM and SGD  depends on the desired outcomes and priorities of the task at hand. SGD remains a solid choice for scenarios where computational efficiency is limited and where the primary focus lies on training speed. Its simplicity and wide applicability make it suitable for various applications. However, if the goal is to enhance generalization performance, mitigate overfitting, or improve model robustness, SAM can be a better alternative. By considering the local sharpness of the loss landscape, SAM aims to produce models with better generalization capabilities, potentially leading to improved performance on unseen data. Thus, while SGD offers simplicity and efficiency, SAM offers the potential for better generalization and robustness, albeit with increased computational overhead.
+Based on the paper, we believe that the choice between SAM and SGD depends on the desired outcomes and priorities of the task at hand. SGD remains a solid choice for scenarios where computational efficiency is limited and where the primary focus lies on training speed. Its simplicity and wide applicability make it suitable for various applications. However, if the goal is to enhance generalization performance, mitigate overfitting, or improve model robustness, SAM can be a better alternative. By considering the local sharpness of the loss landscape, SAM aims to produce models with better generalization capabilities, potentially leading to improved performance on unseen data. Thus, while SGD offers simplicity and efficiency, SAM offers the potential for better generalization and robustness, albeit with increased computational overhead.
 
 ## Training Procedure
 
