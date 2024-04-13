@@ -1,225 +1,90 @@
-<h1 align="center"><b>(Adaptive) SAM Optimizer</b></h1>
-<h3 align="center"><b>Sharpness-Aware Minimization for Efficiently Improving Generalization</b></h3>
-<p align="center">
-  <i>~ in Pytorch ~</i>
-</p> 
- 
---------------
+# Overview of the Original Paper
 
-<br>
+The paper "Sharpness-Aware Minimization for Efficiently Improving Generalization" proposes an optimization method designed to enhance the generalization capabilities of neural networks. The technique, known as Sharpness-Aware Minimization (SAM), is groundbreaking as it shifts the focus from traditional loss minimization to also including the smoothness of the loss landscape. The paper describes that smoother loss landscapes correlate with better generalization in unseen data. This optimization strategy has been validated in their paper and is shown to improve performance across various benchmarks, making it a significant contribution to the field of machine learning
 
-SAM simultaneously minimizes loss value and loss sharpness. In particular, it seeks parameters that lie in **neighborhoods having uniformly low loss**. SAM improves model generalization and yields [SoTA performance for several datasets](https://paperswithcode.com/paper/sharpness-aware-minimization-for-efficiently-1). Additionally, it provides robustness to label noise on par with that provided by SoTA procedures that specifically target learning with noisy labels.
+# Scope of Evaluation
 
-This is an **unofficial** repository for [Sharpness-Aware Minimization for Efficiently Improving Generalization](https://arxiv.org/abs/2010.01412) and [ASAM: Adaptive Sharpness-Aware Minimization for Scale-Invariant Learning of Deep Neural Networks](https://arxiv.org/abs/2102.11600). Implementation-wise, SAM class is a light wrapper that computes the regularized "sharpness-aware" gradient, which is used by the underlying optimizer (such as SGD with momentum). This repository also includes a simple [WRN for Cifar10](example); as a proof-of-concept, it beats the performance of SGD with momentum on this dataset.
+Our evaluation aims to replicate the findings of the original paper using the MNIST fashion dataset and CIFAR-10 dataset. The evaluation is based on the following criteria:  model accuracy, generalization to test datasets, and comparison between SAM and SGD across different epoch settings. Our replication seeks to confirm the findings of the original paper that shows SAM’s robustness over SGD.
 
-<p align="center">
-  <img src="img/loss_landscape.png" alt="Loss landscape with and without SAM" width="512"/>  
-</p>
+# Dataset
 
-<p align="center">
-  <sub><em>ResNet loss landscape at the end of training with and without SAM. Sharpness-aware updates lead to a significantly wider minimum, which then leads to better generalization properties.</em></sub>
-</p>
+For our replication study, we chose the CIFAR-10 and MNIST fashion datasets, both widely recognized benchmarks in the machine learning field. CIFAR-10 is known for its complexity and diversity in image classification tasks, and the MNIST fashion dataset provides a set of grayscale images of apparel that provide their own challenges. The choice of these datasets is relevant as they are standard for evaluating the generalization improvements claimed by SAM and are different enough from each other to provide a more thorough review.
 
-<br>
+# Data Pre-processing
 
-## Usage
+To ensure that training was effective, we implemented a series of pre-processing steps. For both datasets, we normalized the images to have a consistent mean and standard deviation, aiding in model convergence and performance. We applied random crops and horizontal flips to introduce variability, in order to simulate data augmentation techniques that improve model robustness. Additionally, we utilized a technique known as Cutout as a form of regularization, randomly masking out sections of input images during training to further push the model towards better generalization.
 
-It should be straightforward to use SAM in your training pipeline. Just keep in mind that the training will run twice as slow, because SAM needs two forward-backward passes to estime the "sharpness-aware" gradient. If you're using gradient clipping, make sure to change only the magnitude of gradients, not their direction.
+—--------------------------
 
-```python
-from sam import SAM
-...
+VIRAJ
 
-model = YourModel()
-base_optimizer = torch.optim.SGD  # define an optimizer for the "sharpness-aware" update
-optimizer = SAM(model.parameters(), base_optimizer, lr=0.1, momentum=0.9)
-...
+—--------------------------
 
-for input, output in data:
+# Experiment SAM vs. SGD\
+The experiment was designed to compare the performance of the optimization algorithms Sharpness-Aware Minimization (SAM) and Stochastic Gradient Descent (SGD) on training a wide residual network (Wide-res-net). The model was trained on two datasets: CIFAR-10 and MNIST Fashion. The training was carried out over two different lengths: 100 epochs and 200 epochs. Each configuration was run three times to ensure the reliability of the results.
 
-  # first forward-backward pass
-  loss = loss_function(output, model(input))  # use this loss for any training statistics
-  loss.backward()
-  optimizer.first_step(zero_grad=True)
-  
-  # second forward-backward pass
-  loss_function(output, model(input)).backward()  # make sure to do a full forward pass
-  optimizer.second_step(zero_grad=True)
-...
-```
+The hypothesis is that SAM will perform better than SGD because it is better at generalizing.
 
-<br>
+|              |        |       |       |         |         |
+| ------------ | -----: | ----- | ----- | ------- | ------- |
+|              | Epochs | Sam   | SGD   | Sam     | SGD     |
+| Wide-res-net |    100 | 96.58 % | 96.29 % | 95.70 % | 95.67 % |
+|              |    100 | 96.47 % | 96.43 % | 95.54 % | 95.91 % |
+|              |    100 | 96.18 % | 96.38 % | 95.46 % | 95.79 % |
+| Average:     |        | 96.41 % | 96.37 % | 95.57 % | 95.79 % |
+|              |    200 | 96.69 % | 96.86 % | 95.77 % | 95.90 % |
+|              |    200 | 96.96 % | 96.83 % | 96.04 % | 95.94 % |
+|              |    200 | 96.98 % | 96.87 % | 95.77 % | 95.92 % |
+| Average:     |        | 96.88 % | 96.85 % | 95.86 % | 95.92 % |
 
-**Alternative usage with a single closure-based `step` function**. This alternative offers similar API to native PyTorch optimizers like LBFGS (kindly suggested by [@rmcavoy](https://github.com/rmcavoy)):
+The results indicate that the performance of SAM and SGD is roughly equivalent, which is unexpected given the findings from the original research paper, where SAM was reported to outperform SGD. This discrepancy could be attributed to several factors: The architecture of the Wide-res-net used in our experiments, although intended to mimic that of the research paper, might have differences in layer configurations, activation functions, or other architectural details that affect the performance of the optimizers.
 
-```python
-from sam import SAM
-...
+Experiment SimpleNN model SGD vs SAM\
+The first experiment did not give the results we expected, so we decided to do a simpler experiment with a smaller dataset and model. A smaller experiment is easier to understand and conduct so this seemed like a good option. Instead of the big wideResNet model, we used a simple 3-layer fully connected model to learn to classify the classic MNIST digits dataset.
 
-model = YourModel()
-base_optimizer = torch.optim.SGD  # define an optimizer for the "sharpness-aware" update
-optimizer = SAM(model.parameters(), base_optimizer, lr=0.1, momentum=0.9)
-...
+This experiment evaluates the performance of Stochastic Gradient Descent (SGD) and Sharpness-Aware Minimization (SAM) on a simple neural network model—a fully connected, two-layer neural network—using the MNIST digits dataset.
 
-for input, output in data:
-  def closure():
-    loss = loss_function(output, model(input))
-    loss.backward()
-    return loss
+# Methodology
 
-  loss = loss_function(output, model(input))
-  loss.backward()
-  optimizer.step(closure)
-  optimizer.zero_grad()
-...
-```
+Hyperparameter Optimization:
 
-### Training tips
-- [@hjq133](https://github.com/hjq133): The suggested usage can potentially cause problems if you use batch normalization. The running statistics are computed in both forward passes, but they should be computed only for the first one. A possible solution is to set BN momentum to zero (kindly suggested by [@ahmdtaha](https://github.com/ahmdtaha)) to bypass the running statistics during the second pass. An example usage is on lines [51](https://github.com/davda54/sam/blob/cdcbdc1574022d3a3c3240da136378c38562d51d/example/train.py#L51) and [58](https://github.com/davda54/sam/blob/cdcbdc1574022d3a3c3240da136378c38562d51d/example/train.py#L58) in [example/train.py](https://github.com/davda54/sam/blob/cdcbdc1574022d3a3c3240da136378c38562d51d/example/train.py):
-```python
-for batch in dataset.train:
-  inputs, targets = (b.to(device) for b in batch)
+SAM: We optimized both the learning rate and the rho parameter through a grid search. The learning rates tested were \[0.01, 0.05, 0.1, 0.2, 0.3] and the rho values were \[0.01, 0.05, 0.1].
 
-  # first forward-backward step
-  enable_running_stats(model)  # <- this is the important line
-  predictions = model(inputs)
-  loss = smooth_crossentropy(predictions, targets)
-  loss.mean().backward()
-  optimizer.first_step(zero_grad=True)
+SGD: Optimization focused solely on the learning rate, testing the same range of values as SAM.
 
-  # second forward-backward step
-  disable_running_stats(model)  # <- this is the important line
-  smooth_crossentropy(model(inputs), targets).mean().backward()
-  optimizer.second_step(zero_grad=True)
-```
+Experimental Setup
 
-- [@evanatyourservice](https://github.com/evanatyourservice): If you plan to train on multiple GPUs, the paper states that *"To compute the SAM update when parallelizing across multiple accelerators, we divide each data batch evenly among the accelerators, independently compute the SAM gradient on each accelerator, and average the resulting sub-batch SAM gradients to obtain the final SAM update."* This can be achieved by the following code:
-```python
-for input, output in data:
-  # first forward-backward pass
-  loss = loss_function(output, model(input))
-  with model.no_sync():  # <- this is the important line
-    loss.backward()
-  optimizer.first_step(zero_grad=True)
-  
-  # second forward-backward pass
-  loss_function(output, model(input)).backward()
-  optimizer.second_step(zero_grad=True)
-```
-- [@evanatyourservice](https://github.com/evanatyourservice): Adaptive SAM reportedly performs better than the original SAM. The ASAM paper suggests to use higher `rho` for the adaptive updates (~10x larger)
+Upon establishing the optimal hyperparameters (learning rate=0.05), the simple neural network model was trained using each optimizer configuration five times, with each run lasting 100 epochs. This extensive testing ensures the reliability of our findings.
 
-- [@mlaves](https://github.com/mlaves): LR scheduling should be either applied to the base optimizer or you should use SAM with a single `step` call (with a closure):
-```python
-scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer.base_optimizer, T_max=200)
-```
-- [@AlbertoSabater](https://github.com/AlbertoSabater): Integration with Pytorch Lightning — you can write the `training_step` function as:
-```python
-def training_step(self, batch, batch_idx):
-    optimizer = self.optimizers()
+The results are:
 
-    # first forward-backward pass
-    loss_1 = self.compute_loss(batch)
-    self.manual_backward(loss_1, optimizer)
-    optimizer.first_step(zero_grad=True)
+|          |        |        |                 |
+| -------- | -----: | ------ | --------------- |
+|          |        | MNIST  |                 |
+|          | Epochs | SAM    | SGD             |
+| SimpleNN |    100 | 5 runs | 5 runs          |
+|          |        | 98.79  | 98.73           |
+|          |        | 98.79  | 98.73           |
+|          |        | 98.79  | 98.73           |
+|          |        | 98.79  | 98.73           |
+|          |        | 98.79  | 98.73           |
 
-    # second forward-backward pass
-    loss_2 = self.compute_loss(batch)
-    self.manual_backward(loss_2, optimizer)
-    optimizer.second_step(zero_grad=True)
+ 
 
-    return loss_1
-```
-<br>
+The results show that SAM performs better than SGD, but only slightly.
 
+# Discussion
 
-## Documentation
+Sadly, once again the results don't tell us much. SAM came out ahead by a very tiny margin, but nothing significant. Interestingly for both SAM and SGD over the 5 runs there was 0 variance, indicating a very easy to find minimum. This might explain the lack of difference between the two. In simpler models, which typically have smoother loss landscapes, the benefits of SAM might be less noticeable. SAM is made to find flatter minima in the loss landscape, which are associated with better generalization on unseen data. However, because simpler models inherently have fewer sharp minima, the landscape is already relatively flat. This means that the improvement SAM offers could be minimal compared to SGD.
 
-#### `SAM.__init__`
+# Conclusion
 
-| **Argument**    | **Description** |
-| :-------------- | :-------------- |
-| `params` (iterable) | iterable of parameters to optimize or dicts defining parameter groups |
-| `base_optimizer` (torch.optim.Optimizer) | underlying optimizer that does the "sharpness-aware" update |
-| `rho` (float, optional)           | size of the neighborhood for computing the max loss *(default: 0.05)* |
-| `adaptive` (bool, optional)       | set this argument to True if you want to use an experimental implementation of element-wise Adaptive SAM *(default: False)* |
-| `**kwargs` | keyword arguments passed to the `__init__` method of `base_optimizer` |
+In conclusion, SAM is an interesting variant on optimizers that minimizes the sharpness of the loss landscape while simultaneously minimizing the loss. This causes the resulting network to generalize better to data not in the training set at the cost of an extra backpropagation at every step. We performed two experiments, the first was a reproduction of a part of the experiments performed in the paper. We saw quite different results than reported in the original paper. There was no significant difference between SAM and SGD. We hypothesized some possible reasons that could explain this difference and performed another experiment. This experiment was simpler than the first but still, the same results were found. From this, we can conclude that when optimizing a wideResNet on both the Cifar-10 and fashion MNIST dataset, there is no significant advantage to using a SAM optimizer over the pytorch SGD optimizer. Lastly, we found that a simple network architecture also does not give SAM a sizable advantage over SGD.
 
-<br>
+# Future work:
 
-#### `SAM.first_step`
+\- Try more complex data sets like Cifar-100 and Caltech101
 
-Performs the first optimization step that finds the weights with the highest loss in the local `rho`-neighborhood.
+\- Over the years some variants of SAM have been researched. The experiments can be repeated using those.
 
-| **Argument**    | **Description** |
-| :-------------- | :-------------- |
-| `zero_grad` (bool, optional) | set to True if you want to automatically zero-out all gradients after this step *(default: False)* |
-
-<br>
-
-#### `SAM.second_step`
-
-Performs the second optimization step that updates the original weights with the gradient from the (locally) highest point in the loss landscape.
-
-| **Argument**    | **Description** |
-| :-------------- | :-------------- |
-| `zero_grad` (bool, optional) | set to True if you want to automatically zero-out all gradients after this step *(default: False)* |
-
-<br>
-
-#### `SAM.step`
-
-Performs both optimization steps in a single call. This function is an alternative to explicitly calling `SAM.first_step` and `SAM.second_step`.
-
-| **Argument**    | **Description** |
-| :-------------- | :-------------- |
-| `closure` (callable) | the closure should do an additional full forward and backward pass on the optimized model *(default: None)* |
-
-
-
-
-<br>
-
-## Experiments
-
-I've verified that SAM works on a simple WRN 16-8 model run on CIFAR10; you can replicate the experiment by running [train.py](example/train.py). The Wide-ResNet is enhanced only by label smoothing and the most basic image augmentations with cutout, so the errors are higher than those in the [SAM paper](https://arxiv.org/abs/2010.01412). Theoretically, you can get even lower errors by running for longer (1800 epochs instead of 200), because SAM shouldn't be as prone to overfitting. SAM uses `rho=0.05`, while ASAM is set to `rho=2.0`, as [suggested by its authors](https://github.com/davda54/sam/issues/37).
-
-| Optimizer             | Test error rate |
-| :-------------------- |   -----: |
-| SGD + momentum        |   3.20 % |
-| SAM + SGD + momentum  |   2.86 % |
-| ASAM + SGD + momentum |   2.55 % |
-
-
-<br>
-
-## Cite
-
-Please cite the original authors if you use this optimizer in your work:
-
-```bibtex
-@inproceedings{foret2021sharpnessaware,
-  title={Sharpness-aware Minimization for Efficiently Improving Generalization},
-  author={Pierre Foret and Ariel Kleiner and Hossein Mobahi and Behnam Neyshabur},
-  booktitle={International Conference on Learning Representations},
-  year={2021},
-  url={https://openreview.net/forum?id=6Tm1mposlrM}
-}
-```
-
-```bibtex
-@inproceesings{pmlr-v139-kwon21b,
-  title={ASAM: Adaptive Sharpness-Aware Minimization for Scale-Invariant Learning of Deep Neural Networks},
-  author={Kwon, Jungmin and Kim, Jeongseop and Park, Hyunseo and Choi, In Kwon},
-  booktitle ={Proceedings of the 38th International Conference on Machine Learning},
-  pages={5905--5914},
-  year={2021},
-  editor={Meila, Marina and Zhang, Tong},
-  volume={139},
-  series={Proceedings of Machine Learning Research},
-  month={18--24 Jul},
-  publisher ={PMLR},
-  pdf={http://proceedings.mlr.press/v139/kwon21b/kwon21b.pdf},
-  url={https://proceedings.mlr.press/v139/kwon21b.html},
-  abstract={Recently, learning algorithms motivated from sharpness of loss surface as an effective measure of generalization gap have shown state-of-the-art performances. Nevertheless, sharpness defined in a rigid region with a fixed radius, has a drawback in sensitivity to parameter re-scaling which leaves the loss unaffected, leading to weakening of the connection between sharpness and generalization gap. In this paper, we introduce the concept of adaptive sharpness which is scale-invariant and propose the corresponding generalization bound. We suggest a novel learning method, adaptive sharpness-aware minimization (ASAM), utilizing the proposed generalization bound. Experimental results in various benchmark datasets show that ASAM contributes to significant improvement of model generalization performance.}
-}
-```
+\- Sam can be compared against more modern optimizers, like Adam for instance.
