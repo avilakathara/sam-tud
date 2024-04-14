@@ -79,7 +79,7 @@ The experiment was designed to compare the performance of the optimization algor
 
 The hypothesis is that SAM will perform better than SGD because it is better at generalizing.
 
-The results of this experiment are displayed in Table 1.
+The results of this experiment are displayed in Table 1. Each value is the largest test set accuracy obtained during that run.
 
 <div align="center">
 <h4 style="bold">Table 1: SAM vs. SGD Comparison</h4>
@@ -116,7 +116,7 @@ Experimental Setup
 
 Upon establishing the optimal hyperparameters for SGD (learning rate=0.05) and for SAM (learning rate=0.05, rho=0.05), the simple neural network model was trained using each optimizer configuration five times, with each run lasting 100 epochs. This extensive testing ensures the reliability of our findings.
 
-The results of this experiment are displayed in Table 2.
+The results of this experiment are displayed in Table 2. Each value is the largest test set accuracy obtained during that run.
 
 <div align="center">
   
